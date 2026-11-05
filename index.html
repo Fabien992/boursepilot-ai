@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BoursePilot AI">
+<title>BoursePilot AI</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#131e30;--panel2:#1a2940;--text:#f4f7fb;--muted:#a8b5c7;--line:#2a3a52;--green:#35d39a;--red:#ff7272;--blue:#7db6ff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2d,#0b1220 320px);color:var(--text);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 14px calc(24px + env(safe-area-inset-bottom));}
+main{max-width:760px;margin:0 auto}.top{padding:22px 4px 16px}.eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.top h1{font-size:28px;margin:7px 0 5px}.sub{color:var(--muted);font-size:14px;line-height:1.4}
+.panel{background:rgba(19,30,48,.96);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 8px 24px #0002}
+h2{font-size:17px;margin:0 0 13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:var(--panel2);border-radius:13px;padding:13px;min-width:0}.metric small{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}.metric strong{font-size:20px;overflow-wrap:anywhere}.positive{color:var(--green)}.negative{color:var(--red)}
+label{display:block;color:var(--muted);font-size:13px;margin:11px 0 6px}input,select{width:100%;border:1px solid var(--line);border-radius:11px;background:#0c1626;color:var(--text);padding:13px;font:inherit;min-height:46px}input:focus,select:focus{outline:2px solid #7db6ff66;border-color:var(--blue)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btnrow{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}button{border:0;border-radius:12px;padding:13px 15px;font:700 14px inherit;cursor:pointer;min-height:46px;background:var(--blue);color:#071426;touch-action:manipulation}button.secondary{background:#263851;color:var(--text);border:1px solid #3b506c}button.danger{background:#492631;color:#ffd9df;border:1px solid #75404c}button:active{transform:scale(.98)}
+.item{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);align-items:center}.item:first-child{border-top:0}.item strong{display:block}.item small{display:block;color:var(--muted);margin-top:4px}.item-right{text-align:right;white-space:nowrap}.item-right button{margin-top:7px;min-height:34px;padding:7px 10px;font-size:12px}
+.empty{color:var(--muted);font-size:14px;padding:8px 0}.hint{font-size:12px;color:var(--muted);line-height:1.5}.notice{border-left:3px solid var(--blue);padding:9px 11px;background:#172941;border-radius:8px;color:#d7e8ff;font-size:13px;line-height:1.45}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:18px 6px}
+@media(max-width:390px){.grid{grid-template-columns:1fr 1fr}.metric strong{font-size:17px}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<header class="top">
+<div class="eyebrow">Tableau de bord personnel</div>
+<h1>📈 BoursePilot AI</h1>
+<div class="sub">Suis tes investissements, tes montants et tes performances en toute simplicité.</div>
+</header>
+
+<section class="panel">
+<h2>Mon portefeuille</h2>
+<div class="grid">
+<div class="metric"><small>Valeur actuelle</small><strong id="totalValue">0,00 €</strong></div>
+<div class="metric"><small>Montant investi</small><strong id="invested">0,00 €</strong></div>
+<div class="metric"><small>Gain / perte</small><strong id="gain">0,00 €</strong></div>
+<div class="metric"><small>Performance</small><strong id="performance">—</strong></div>
+</div>
+<label for="cash">Liquidités disponibles (€)</label>
+<input id="cash" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex. 500">
+<div class="btnrow"><button id="saveCash" type="button">Enregistrer les liquidités</button></div>
+<p class="hint">Tu définis librement tes montants. Aucun budget fixe n'est imposé.</p>
+</section>
+
+<section class="panel">
+<h2 id="positionHeading">Ajouter une position</h2>
+<form id="positionForm">
+<input type="hidden" id="editId">
+<label for="asset">Nom de l'actif (ETF, action, crypto…)</label>
+<input id="asset" maxlength="60" required placeholder="Ex. Amundi Nasdaq-100">
+<div class="row">
+<div><label for="quantity">Quantité</label><input id="quantity" type="number" min="0.00000001" step="any" inputmode="decimal" required placeholder="Ex. 2"></div>
+<div><label for="buyPrice">Prix d'achat unitaire (€)</label><input id="buyPrice" type="number" min="0" step="any" inputmode="decimal" required placeholder="Ex. 50"></div>
+</div>
+<label for="currentPrice">Cours actuel unitaire (€)</label>
+<input id="currentPrice" type="number" min="0" step="any" inputmode="decimal" required placeholder="Ex. 54">
+<div class="btnrow"><button id="savePosition" type="submit">Ajouter la position</button><button id="cancelEdit" class="secondary" type="button" hidden>Annuler</button></div>
+</form>
+</section>
+
+<section class="panel">
+<h2>Mes positions</h2>
+<div id="positions" class="empty">Aucune position pour le moment. Ajoute ton premier actif ci-dessus.</div>
+</section>
+
+<section class="panel">
+<h2>Enregistrer une opération</h2>
+<form id="transactionForm">
+<div class="row">
+<div><label for="txType">Type</label><select id="txType"><option value="Achat">Achat</option><option value="Vente">Vente</option><option value="Dépôt">Dépôt de liquidités</option><option value="Retrait">Retrait de liquidités</option></select></div>
+<div><label for="txAmount">Montant (€)</label><input id="txAmount" type="number" min="0.01" step="0.01" inputmode="decimal" required placeholder="Ex. 100"></div>
+</div>
+<label for="txNote">Note (facultatif)</label><input id="txNote" maxlength="100" placeholder="Ex. Achat ETF">
+<div class="btnrow"><button type="submit">Enregistrer l'opération</button></div>
+</form>
+</section>
+
+<section class="panel">
+<h2>Historique</h2>
+<div id="history" class="empty">Aucune opération enregistrée.</div>
+<div class="btnrow"><button id="export" class="secondary" type="button">Exporter en CSV</button><button id="reset" class="danger" type="button">Effacer toutes les données</button></div>
+</section>
+<div class="notice">Les cours sont à saisir manuellement. Cette version ne se connecte pas à Boursorama, ne récupère pas les cotations en direct et ne passe aucun ordre. Tes données restent enregistrées dans le stockage local de ce navigateur.</div>
+<footer>BoursePilot AI · Version 2 · Outil de suivi, pas un conseil en investissement.</footer>
+</main>
+<script>
+(function(){
+"use strict";
+const KEY="boursepilot_v2_data";
+const $=id=>document.getElementById(id);
+const money=n=>Number(n||0).toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+const num=id=>Number($(id).value);
+let state={cash:0,positions:[],history:[]};
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&typeof s==="object")state={cash:Number(s.cash)||0,positions:Array.isArray(s.positions)?s.positions:[],history:Array.isArray(s.history)?s.history:[]};}catch(e){state={cash:0,positions:[],history:[]};}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){alert("La sauvegarde locale a échoué. Vérifie les réglages Safari et l'espace disponible.");}}
+function totals(){let invested=0,value=0;state.positions.forEach(p=>{invested+=Number(p.qty)*Number(p.buy);value+=Number(p.qty)*Number(p.current);});return {invested,value,gain:value-invested,perf:invested?(value-invested)/invested*100:null};}
+function render(){
+ const t=totals();$("totalValue").textContent=money(t.value);$("invested").textContent=money(t.invested);
+ const g=$("gain");g.textContent=money(t.gain);g.className=t.gain>=0?"positive":"negative";
+ $("performance").textContent=t.perf===null?"—":t.perf.toLocaleString("fr-FR",{maximumFractionDigits:2})+" %";
+ $("cash").value=state.cash;
+ const pos=$("positions");
+ if(!state.positions.length){pos.className="empty";pos.textContent="Aucune position pour le moment. Ajoute ton premier actif ci-dessus.";}
+ else{pos.className="";pos.innerHTML=state.positions.map(p=>{const v=p.qty*p.current,pl=v-p.qty*p.buy;return `<div class="item"><div><strong>${esc(p.name)}</strong><small>${p.qty} × ${money(p.current)} · Achat ${money(p.buy)}</small></div><div class="item-right"><strong>${money(v)}</strong><small class="${pl>=0?"positive":"negative"}">${pl>=0?"+":""}${money(pl)}</small><button class="secondary" type="button" data-edit="${p.id}">Modifier</button> <button class="danger" type="button" data-delete="${p.id}">Supprimer</button></div></div>`}).join("");}
+ const hist=$("history");
+ if(!state.history.length){hist.className="empty";hist.textContent="Aucune opération enregistrée.";}
+ else{hist.className="";hist.innerHTML=state.history.slice().reverse().map(h=>`<div class="item"><div><strong>${esc(h.type)} · ${money(h.amount)}</strong><small>${esc(h.note||"Sans note")} · ${esc(h.date)}</small></div></div>`).join("");}
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+$("saveCash").addEventListener("click",()=>{const v=num("cash");if(!Number.isFinite(v)||v<0){alert("Entre un montant valide.");return;}state.cash=v;save();render();alert("Liquidités enregistrées.");});
+$("positionForm").addEventListener("submit",e=>{e.preventDefault();const name=$("asset").value.trim(),qty=num("quantity"),buy=num("buyPrice"),current=num("currentPrice");if(!name||![qty,buy,current].every(Number.isFinite)||qty<=0||buy<0||current<0){alert("Vérifie les champs : quantité supérieure à zéro et prix non négatifs.");return;}const id=$("editId").value;if(id){const p=state.positions.find(x=>String(x.id)===id);if(p)Object.assign(p,{name,qty,buy,current});}else state.positions.push({id:String(Date.now())+Math.random().toString(16).slice(2),name,qty,buy,current});state.history.push({type:id?"Modification de position":"Position ajoutée",amount:qty*current,note:name,date:new Date().toLocaleString("fr-FR")});save();$("positionForm").reset();$("editId").value="";$("positionHeading").textContent="Ajouter une position";$("savePosition").textContent="Ajouter la position";$("cancelEdit").hidden=true;render();});
+$("positions").addEventListener("click",e=>{const edit=e.target.closest("[data-edit]"),del=e.target.closest("[data-delete]");if(edit){const p=state.positions.find(x=>String(x.id)===edit.dataset.edit);if(!p)return;$("editId").value=p.id;$("asset").value=p.name;$("quantity").value=p.qty;$("buyPrice").value=p.buy;$("currentPrice").value=p.current;$("positionHeading").textContent="Modifier la position";$("savePosition").textContent="Enregistrer les modifications";$("cancelEdit").hidden=false;$("asset").scrollIntoView({behavior:"smooth",block:"center"});}if(del){const p=state.positions.find(x=>String(x.id)===del.dataset.delete);if(p&&confirm("Supprimer "+p.name+" ?")){state.positions=state.positions.filter(x=>String(x.id)!==String(p.id));save();render();}}});
+$("cancelEdit").addEventListener("click",()=>{$("positionForm").reset();$("editId").value="";$("positionHeading").textContent="Ajouter une position";$("savePosition").textContent="Ajouter la position";$("cancelEdit").hidden=true;});
+$("transactionForm").addEventListener("submit",e=>{e.preventDefault();const type=$("txType").value,amount=num("txAmount"),note=$("txNote").value.trim();if(!Number.isFinite(amount)||amount<=0){alert("Entre un montant supérieur à zéro.");return;}if(type==="Dépôt")state.cash+=amount;if(type==="Retrait"){if(amount>state.cash){alert("Le retrait dépasse tes liquidités disponibles.");return;}state.cash-=amount;}state.history.push({type,amount,note,date:new Date().toLocaleString("fr-FR")});save();$("transactionForm").reset();render();alert("Opération enregistrée.");});
+$("export").addEventListener("click",()=>{const rows=[["Type","Nom","Quantité","Prix achat","Cours actuel","Montant","Date"]];state.positions.forEach(p=>rows.push(["Position",p.name,p.qty,p.buy,p.current,p.qty*p.current,""]));state.history.forEach(h=>rows.push([h.type,"","","","",h.amount,h.date]));rows.push(["Liquidités","","","","",state.cash,""]);const csv=rows.map(r=>r.map(x=>'"'+String(x??"").replace(/"/g,'""')+'"').join(";")).join("\r\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="boursepilot-export.csv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+$("reset").addEventListener("click",()=>{if(confirm("Effacer définitivement les positions, liquidités et l'historique de cet appareil ?")){state={cash:0,positions:[],history:[]};save();render();}});
+load();render();
+})();
+</script>
+</body>
+</html>
